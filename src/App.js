@@ -4,6 +4,7 @@ import { Copy, Check, Eye, Code, Palette } from 'lucide-react';
 export default function PopupDesigner() {
   const [activeTab, setActiveTab] = useState('design');
   const [copied, setCopied] = useState(false);
+  const [copiedConsole, setCopiedConsole] = useState(false);
   const [showPreview, setShowPreview] = useState(false);
   const [previewStep, setPreviewStep] = useState('form'); // 'form' or 'success'
   
@@ -22,7 +23,7 @@ export default function PopupDesigner() {
     
     // Rabattkod sida
     successHeadline: 'Tack! 🎉',
-    successDescription: 'Här är din rabatkkod:',
+    successDescription: 'Här är din rabattkod:',
     discountCode: 'BYTHJUL10',
     closeButtonText: 'Stäng',
     
@@ -34,8 +35,8 @@ export default function PopupDesigner() {
     // API
     apiUrl: 'https://www.bythjul.com/api/misc/newsletter',
     
-    // Base URL (ändra detta efter Vercel-deploy)
-    baseUrl: 'https://bythjul-popup.vercel.app'
+    // Base URL
+    baseUrl: 'https://pop-up-bythjul.vercel.app'
   });
 
   const updateConfig = (key, value) => {
@@ -358,31 +359,58 @@ export default function PopupDesigner() {
               </div>
             </div>
 
-            {/* Generate Script Button */}
+            {/* Generate Script Buttons */}
             <div className="bg-white rounded-lg shadow-sm p-6">
               <h3 className="text-lg font-semibold mb-4 flex items-center">
                 <Code className="w-5 h-5 mr-2" />
                 Genererad kod
               </h3>
-              <button
-                onClick={copyScript}
-                className="w-full bg-blue-600 text-white py-3 px-4 rounded-lg font-medium hover:bg-blue-700 transition flex items-center justify-center"
-              >
-                {copied ? (
-                  <>
-                    <Check className="w-5 h-5 mr-2" />
-                    Kopierad!
-                  </>
-                ) : (
-                  <>
-                    <Copy className="w-5 h-5 mr-2" />
-                    Kopiera script
-                  </>
-                )}
-              </button>
-              <p className="text-sm text-gray-600 mt-3">
-                Klistra in koden i {'<head>'} eller innan {'</body>'} på din site
-              </p>
+              
+              <div className="space-y-3">
+                <div>
+                  <p className="text-sm text-gray-600 mb-2">
+                    <strong>🧪 Test i konsollen:</strong> Kör på vilken site som helst för att testa
+                  </p>
+                  <button
+                    onClick={copyConsoleScript}
+                    className="w-full bg-green-600 text-white py-3 px-4 rounded-lg font-medium hover:bg-green-700 transition flex items-center justify-center"
+                  >
+                    {copiedConsole ? (
+                      <>
+                        <Check className="w-5 h-5 mr-2" />
+                        Kopierad!
+                      </>
+                    ) : (
+                      <>
+                        <Copy className="w-5 h-5 mr-2" />
+                        Kopiera konsol-script
+                      </>
+                    )}
+                  </button>
+                </div>
+
+                <div className="border-t pt-3">
+                  <p className="text-sm text-gray-600 mb-2">
+                    <strong>📦 Installation:</strong> Lägg på webbplatsen permanent
+                  </p>
+                  <button
+                    onClick={copyScript}
+                    className="w-full bg-blue-600 text-white py-3 px-4 rounded-lg font-medium hover:bg-blue-700 transition flex items-center justify-center"
+                  >
+                    {copied ? (
+                      <>
+                        <Check className="w-5 h-5 mr-2" />
+                        Kopierad!
+                      </>
+                    ) : (
+                      <>
+                        <Copy className="w-5 h-5 mr-2" />
+                        Kopiera installations-script
+                      </>
+                    )}
+                  </button>
+                </div>
+              </div>
             </div>
           </div>
 
