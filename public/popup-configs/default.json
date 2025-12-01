@@ -1,0 +1,18 @@
+{
+  "primaryColor": "#FF6B6B",
+  "backgroundColor": "#FFFFFF",
+  "textColor": "#333333",
+  "overlayColor": "rgba(0, 0, 0, 0.5)",
+  "headline": "Få 100kr rabatt!",
+  "description": "Registrera din e-post och få en rabattkod direkt",
+  "buttonText": "Få rabattkod",
+  "placeholder": "Din e-postadress",
+  "successHeadline": "Tack! 🎉",
+  "successDescription": "Här är din rabattkod:",
+  "discountCode": "BYTHJUL10",
+  "closeButtonText": "Stäng",
+  "showDelay": 1000,
+  "showOnScroll": false,
+  "scrollPercentage": 50,
+  "apiUrl": "https://www.bythjul.com/api/misc/newsletter"
+}
