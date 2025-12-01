@@ -5,6 +5,7 @@ export default function PopupDesigner() {
   const [activeTab, setActiveTab] = useState('design');
   const [copied, setCopied] = useState(false);
   const [copiedConsole, setCopiedConsole] = useState(false);
+  const [copiedConsoleLive, setCopiedConsoleLive] = useState(false);
   const [showPreview, setShowPreview] = useState(false);
   const [previewStep, setPreviewStep] = useState('form'); // 'form' or 'success'
   
@@ -369,7 +370,7 @@ export default function PopupDesigner() {
               <div className="space-y-3">
                 <div>
                   <p className="text-sm text-gray-600 mb-2">
-                    <strong>🧪 Test i konsollen:</strong> Kör på vilken site som helst för att testa
+                    <strong>🎨 Test-läge (Mock API):</strong> Visa design utan att skicka data
                   </p>
                   <button
                     onClick={copyConsoleScript}
@@ -383,7 +384,29 @@ export default function PopupDesigner() {
                     ) : (
                       <>
                         <Copy className="w-5 h-5 mr-2" />
-                        Kopiera konsol-script
+                        Kopiera test-script (Mock)
+                      </>
+                    )}
+                  </button>
+                </div>
+
+                <div>
+                  <p className="text-sm text-gray-600 mb-2">
+                    <strong>🚀 Live-läge (Riktigt API):</strong> Registrerar e-post på riktigt
+                  </p>
+                  <button
+                    onClick={copyConsoleLiveScript}
+                    className="w-full bg-orange-600 text-white py-3 px-4 rounded-lg font-medium hover:bg-orange-700 transition flex items-center justify-center"
+                  >
+                    {copiedConsoleLive ? (
+                      <>
+                        <Check className="w-5 h-5 mr-2" />
+                        Kopierad!
+                      </>
+                    ) : (
+                      <>
+                        <Copy className="w-5 h-5 mr-2" />
+                        Kopiera live-script (API)
                       </>
                     )}
                   </button>
