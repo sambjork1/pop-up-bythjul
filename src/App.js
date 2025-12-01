@@ -7,36 +7,25 @@ export default function PopupDesigner() {
   const [copiedConsole, setCopiedConsole] = useState(false);
   const [copiedConsoleLive, setCopiedConsoleLive] = useState(false);
   const [showPreview, setShowPreview] = useState(false);
-  const [previewStep, setPreviewStep] = useState('form'); // 'form' or 'success'
+  const [previewStep, setPreviewStep] = useState('form');
   
   const [config, setConfig] = useState({
-    // Utseende
     primaryColor: '#FF6B6B',
     backgroundColor: '#FFFFFF',
     textColor: '#333333',
     overlayColor: 'rgba(0, 0, 0, 0.5)',
-    
-    // Innehåll
     headline: 'Få 10% rabatt!',
     description: 'Registrera din e-post och få en rabattkod direkt',
     buttonText: 'Få rabattkod',
     placeholder: 'Din e-postadress',
-    
-    // Rabattkod sida
     successHeadline: 'Tack! 🎉',
     successDescription: 'Här är din rabattkod:',
     discountCode: 'BYTHJUL10',
     closeButtonText: 'Stäng',
-    
-    // Beteende
-    showDelay: 3000, // millisekunder
+    showDelay: 3000,
     showOnScroll: false,
     scrollPercentage: 50,
-    
-    // API
     apiUrl: 'https://www.bythjul.com/api/misc/newsletter',
-    
-    // Base URL
     baseUrl: 'https://pop-up-bythjul.vercel.app'
   });
 
@@ -44,18 +33,17 @@ export default function PopupDesigner() {
     setConfig(prev => ({ ...prev, [key]: value }));
   };
 
-  const generateConfigId = () => {
-    return 'popup_' + Date.now();
-  };
-
   const generateScript = () => {
-    const configId = generateConfigId();
-    return `<!-- Bythjul Popup Newsletter -->
+    const configId = 'popup_' + Date.now();
+    const cleanConfig = {...config};
+    delete cleanConfig.baseUrl;
+    
+    return `<!-- Bythjul Popup Newsletter - Installation Script -->
 <script>
 (function() {
   'use strict';
   var script = document.createElement('script');
-  script.src = 'https://www.bythjul.com/popup-loader.js?id=${configId}';
+  script.src = '${config.baseUrl}/popup-loader.js?id=${configId}';
   script.defer = true;
   script.onload = function() { console.log('Bythjul popup loaded'); };
   script.onerror = function() { console.error('Failed to load Bythjul popup'); };
@@ -68,14 +56,36 @@ export default function PopupDesigner() {
   Spara denna config som: /popup-configs/${configId}.json
   
   Config innehåll:
-  ${JSON.stringify(config, null, 2)}
+  ${JSON.stringify(cleanConfig, null, 2)}
 -->`;
+  };
+
+  const generateConsoleScript = () => {
+    const cfg = JSON.stringify(config).replace(/"/g, "'");
+    return `(function(){const c=${cfg};if(document.getElementById('bythjul-test-popup')){document.getElementById('bythjul-test-popup').remove();}const s=document.createElement('style');s.textContent=\`.bythjul-popup-overlay{position:fixed;top:0;left:0;right:0;bottom:0;background:\${c.overlayColor};display:flex;align-items:center;justify-content:center;z-index:999999;opacity:0;transition:opacity .3s ease}.bythjul-popup-overlay.show{opacity:1}.bythjul-popup{background:\${c.backgroundColor};border-radius:16px;padding:40px;max-width:480px;width:90%;box-shadow:0 20px 60px rgba(0,0,0,.3);position:relative;transform:scale(.9);transition:transform .3s ease}.bythjul-popup-overlay.show .bythjul-popup{transform:scale(1)}.bythjul-popup-close{position:absolute;top:16px;right:16px;background:none;border:none;font-size:24px;cursor:pointer;color:#999;line-height:1;padding:4px 8px}.bythjul-popup-close:hover{color:#333}.bythjul-popup h2{margin:0 0 12px 0;color:\${c.textColor};font-size:28px;font-weight:bold}.bythjul-popup p{margin:0 0 24px 0;color:\${c.textColor};font-size:16px;opacity:.8}.bythjul-popup-form{display:flex;flex-direction:column;gap:12px}.bythjul-popup input{padding:14px 16px;border:2px solid #E5E5E5;border-radius:8px;font-size:16px;transition:border-color .2s;width:100%;box-sizing:border-box}.bythjul-popup input:focus{outline:none;border-color:\${c.primaryColor}}.bythjul-popup button{padding:14px 24px;background:\${c.primaryColor};color:white;border:none;border-radius:8px;font-size:16px;font-weight:600;cursor:pointer;transition:transform .2s,opacity .2s}.bythjul-popup button:hover{transform:translateY(-2px);opacity:.9}.bythjul-popup button:disabled{opacity:.6;cursor:not-allowed;transform:none}.bythjul-popup-error{color:#E53E3E;font-size:14px;margin-top:8px}.bythjul-popup-success{text-align:center}.bythjul-discount-code{background:#F7F7F7;border:2px dashed \${c.primaryColor};border-radius:8px;padding:20px;margin:24px 0;font-size:32px;font-weight:bold;color:\${c.primaryColor};letter-spacing:2px}\`;document.head.appendChild(s);const o=document.createElement('div');o.className='bythjul-popup-overlay';o.id='bythjul-test-popup';o.innerHTML=\`<div class="bythjul-popup"><button class="bythjul-popup-close" onclick="document.getElementById('bythjul-test-popup').remove()">×</button><div id="bythjul-popup-content"><h2>\${c.headline}</h2><p>\${c.description}</p><div class="bythjul-popup-form"><input type="email" placeholder="\${c.placeholder}" id="bythjul-email-input"/><button type="button" id="bythjul-submit-btn">\${c.buttonText}</button><div id="bythjul-error" class="bythjul-popup-error"></div></div></div></div>\`;document.body.appendChild(o);setTimeout(()=>o.classList.add('show'),10);const submitBtn=document.getElementById('bythjul-submit-btn');const emailInput=document.getElementById('bythjul-email-input');const errorDiv=document.getElementById('bythjul-error');async function mockApiCall(email){console.log('🧪 MOCK API - Detta är bara för test. E-post skickas INTE:',email);await new Promise(resolve=>setTimeout(resolve,800));return{ok:true,json:async()=>({status:'success',message:'Mock success'})}}submitBtn.addEventListener('click',async(e)=>{e.preventDefault();const email=emailInput.value.trim();if(!email){errorDiv.textContent='Vänligen ange en e-postadress';return}if(!email.includes('@')||!email.includes('.')){errorDiv.textContent='Vänligen ange en giltig e-postadress';return}submitBtn.disabled=true;submitBtn.textContent='Skickar...';errorDiv.textContent='';try{const response=await mockApiCall(email);const data=await response.json();if(response.ok&&data.status==='success'){console.log('✅ Mock success - popup showing discount code');document.getElementById('bythjul-popup-content').innerHTML=\`<div class="bythjul-popup-success"><h2>\${c.successHeadline}</h2><p>\${c.successDescription}</p><div class="bythjul-discount-code">\${c.discountCode}</div><button onclick="document.getElementById('bythjul-test-popup').remove()">\${c.closeButtonText}</button></div>\`}else{throw new Error(data.message||'Något gick fel')}}catch(error){errorDiv.textContent=error.message||'Något gick fel. Försök igen.';submitBtn.disabled=false;submitBtn.textContent=c.buttonText}});emailInput.addEventListener('keypress',(e)=>{if(e.key==='Enter'){submitBtn.click()}});o.addEventListener('click',(e)=>{if(e.target===o){o.remove()}});console.log('🎨 Bythjul popup TEST-läge (Mock API) - E-post skickas INTE till servern')})();`;
+  };
+
+  const generateConsoleLiveScript = () => {
+    const cfg = JSON.stringify(config).replace(/"/g, "'");
+    return `(function(){const c=${cfg};if(document.getElementById('bythjul-test-popup')){document.getElementById('bythjul-test-popup').remove();}const s=document.createElement('style');s.textContent=\`.bythjul-popup-overlay{position:fixed;top:0;left:0;right:0;bottom:0;background:\${c.overlayColor};display:flex;align-items:center;justify-content:center;z-index:999999;opacity:0;transition:opacity .3s ease}.bythjul-popup-overlay.show{opacity:1}.bythjul-popup{background:\${c.backgroundColor};border-radius:16px;padding:40px;max-width:480px;width:90%;box-shadow:0 20px 60px rgba(0,0,0,.3);position:relative;transform:scale(.9);transition:transform .3s ease}.bythjul-popup-overlay.show .bythjul-popup{transform:scale(1)}.bythjul-popup-close{position:absolute;top:16px;right:16px;background:none;border:none;font-size:24px;cursor:pointer;color:#999;line-height:1;padding:4px 8px}.bythjul-popup-close:hover{color:#333}.bythjul-popup h2{margin:0 0 12px 0;color:\${c.textColor};font-size:28px;font-weight:bold}.bythjul-popup p{margin:0 0 24px 0;color:\${c.textColor};font-size:16px;opacity:.8}.bythjul-popup-form{display:flex;flex-direction:column;gap:12px}.bythjul-popup input{padding:14px 16px;border:2px solid #E5E5E5;border-radius:8px;font-size:16px;transition:border-color .2s;width:100%;box-sizing:border-box}.bythjul-popup input:focus{outline:none;border-color:\${c.primaryColor}}.bythjul-popup button{padding:14px 24px;background:\${c.primaryColor};color:white;border:none;border-radius:8px;font-size:16px;font-weight:600;cursor:pointer;transition:transform .2s,opacity .2s}.bythjul-popup button:hover{transform:translateY(-2px);opacity:.9}.bythjul-popup button:disabled{opacity:.6;cursor:not-allowed;transform:none}.bythjul-popup-error{color:#E53E3E;font-size:14px;margin-top:8px}.bythjul-popup-success{text-align:center}.bythjul-discount-code{background:#F7F7F7;border:2px dashed \${c.primaryColor};border-radius:8px;padding:20px;margin:24px 0;font-size:32px;font-weight:bold;color:\${c.primaryColor};letter-spacing:2px}\`;document.head.appendChild(s);const o=document.createElement('div');o.className='bythjul-popup-overlay';o.id='bythjul-test-popup';o.innerHTML=\`<div class="bythjul-popup"><button class="bythjul-popup-close" onclick="document.getElementById('bythjul-test-popup').remove()">×</button><div id="bythjul-popup-content"><h2>\${c.headline}</h2><p>\${c.description}</p><div class="bythjul-popup-form"><input type="email" placeholder="\${c.placeholder}" id="bythjul-email-input"/><button type="button" id="bythjul-submit-btn">\${c.buttonText}</button><div id="bythjul-error" class="bythjul-popup-error"></div></div></div></div>\`;document.body.appendChild(o);setTimeout(()=>o.classList.add('show'),10);const submitBtn=document.getElementById('bythjul-submit-btn');const emailInput=document.getElementById('bythjul-email-input');const errorDiv=document.getElementById('bythjul-error');submitBtn.addEventListener('click',async(e)=>{e.preventDefault();const email=emailInput.value.trim();if(!email){errorDiv.textContent='Vänligen ange en e-postadress';return}if(!email.includes('@')||!email.includes('.')){errorDiv.textContent='Vänligen ange en giltig e-postadress';return}submitBtn.disabled=true;submitBtn.textContent='Skickar...';errorDiv.textContent='';try{console.log('🌐 LIVE API - Skickar till: '+c.apiUrl);const response=await fetch(c.apiUrl,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({email})});const data=await response.json();if(response.ok&&data.status==='success'){console.log('✅ API Success:',data);localStorage.setItem('bythjul_subscribed','true');document.getElementById('bythjul-popup-content').innerHTML=\`<div class="bythjul-popup-success"><h2>\${c.successHeadline}</h2><p>\${c.successDescription}</p><div class="bythjul-discount-code">\${c.discountCode}</div><button onclick="document.getElementById('bythjul-test-popup').remove()">\${c.closeButtonText}</button></div>\`}else{throw new Error(data.message||'Något gick fel')}}catch(error){console.error('❌ API Error:',error);errorDiv.textContent=error.message||'Något gick fel. Försök igen.';submitBtn.disabled=false;submitBtn.textContent=c.buttonText}});emailInput.addEventListener('keypress',(e)=>{if(e.key==='Enter'){submitBtn.click()}});o.addEventListener('click',(e)=>{if(e.target===o){o.remove()}});console.log('🚀 Bythjul popup LIVE-läge - E-post skickas till API: '+c.apiUrl)})();`;
   };
 
   const copyScript = () => {
     navigator.clipboard.writeText(generateScript());
     setCopied(true);
     setTimeout(() => setCopied(false), 2000);
+  };
+
+  const copyConsoleScript = () => {
+    navigator.clipboard.writeText(generateConsoleScript());
+    setCopiedConsole(true);
+    setTimeout(() => setCopiedConsole(false), 2000);
+  };
+
+  const copyConsoleLiveScript = () => {
+    navigator.clipboard.writeText(generateConsoleLiveScript());
+    setCopiedConsoleLive(true);
+    setTimeout(() => setCopiedConsoleLive(false), 2000);
   };
 
   return (
@@ -87,7 +97,6 @@ export default function PopupDesigner() {
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-          {/* Left side - Settings */}
           <div className="space-y-6">
             <div className="bg-white rounded-lg shadow-sm">
               <div className="flex border-b">
@@ -349,10 +358,10 @@ export default function PopupDesigner() {
                         value={config.baseUrl}
                         onChange={(e) => updateConfig('baseUrl', e.target.value)}
                         className="w-full px-3 py-2 border border-gray-300 rounded"
-                        placeholder="https://bythjul-popup.vercel.app"
+                        placeholder="https://pop-up-bythjul.vercel.app"
                       />
                       <p className="text-xs text-gray-500 mt-1">
-                        Uppdatera detta med din Vercel URL efter deploy
+                        Din Vercel deployment URL
                       </p>
                     </div>
                   </>
@@ -360,7 +369,6 @@ export default function PopupDesigner() {
               </div>
             </div>
 
-            {/* Generate Script Buttons */}
             <div className="bg-white rounded-lg shadow-sm p-6">
               <h3 className="text-lg font-semibold mb-4 flex items-center">
                 <Code className="w-5 h-5 mr-2" />
@@ -437,7 +445,6 @@ export default function PopupDesigner() {
             </div>
           </div>
 
-          {/* Right side - Preview */}
           <div className="bg-white rounded-lg shadow-sm p-6">
             <div className="flex justify-between items-center mb-4">
               <h3 className="text-lg font-semibold flex items-center">
@@ -522,42 +529,43 @@ export default function PopupDesigner() {
                       ×
                     </button>
                     
-                    <h2 style={{ margin: '0 0 12px 0', color: config.textColor, fontSize: '28px', fontWeight: 'bold' }}>
-                      {config.headline}
-                    </h2>
-                    <p style={{ margin: '0 0 24px 0', color: config.textColor, fontSize: '16px', opacity: 0.8 }}>
-                      {config.description}
-                    </p>
-                    
                     {previewStep === 'form' ? (
-                      <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
-                        <input 
-                          type="email"
-                          placeholder={config.placeholder}
-                          style={{
-                            padding: '14px 16px',
-                            border: '2px solid #E5E5E5',
-                            borderRadius: '8px',
-                            fontSize: '16px',
-                            width: '100%',
-                            boxSizing: 'border-box'
-                          }}
-                        />
-                        <button
-                          style={{
-                            padding: '14px 24px',
-                            background: config.primaryColor,
-                            color: 'white',
-                            border: 'none',
-                            borderRadius: '8px',
-                            fontSize: '16px',
-                            fontWeight: '600',
-                            cursor: 'pointer'
-                          }}
-                        >
-                          {config.buttonText}
-                        </button>
-                      </div>
+                      <>
+                        <h2 style={{ margin: '0 0 12px 0', color: config.textColor, fontSize: '28px', fontWeight: 'bold' }}>
+                          {config.headline}
+                        </h2>
+                        <p style={{ margin: '0 0 24px 0', color: config.textColor, fontSize: '16px', opacity: 0.8 }}>
+                          {config.description}
+                        </p>
+                        <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+                          <input 
+                            type="email"
+                            placeholder={config.placeholder}
+                            style={{
+                              padding: '14px 16px',
+                              border: '2px solid #E5E5E5',
+                              borderRadius: '8px',
+                              fontSize: '16px',
+                              width: '100%',
+                              boxSizing: 'border-box'
+                            }}
+                          />
+                          <button
+                            style={{
+                              padding: '14px 24px',
+                              background: config.primaryColor,
+                              color: 'white',
+                              border: 'none',
+                              borderRadius: '8px',
+                              fontSize: '16px',
+                              fontWeight: '600',
+                              cursor: 'pointer'
+                            }}
+                          >
+                            {config.buttonText}
+                          </button>
+                        </div>
+                      </>
                     ) : (
                       <div style={{ textAlign: 'center' }}>
                         <h2 style={{ margin: '0 0 12px 0', color: config.textColor, fontSize: '28px', fontWeight: 'bold' }}>
